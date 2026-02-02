@@ -6,7 +6,7 @@ interface StatsCardProps {
   title: string;
   value: string | number;
   icon: string;
-  color: string;
+  color: 'green' | 'gray' | 'blue' | 'purple' | 'yellow' | 'red';
   delay?: number;
 }
 

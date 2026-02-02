@@ -1,0 +1,8 @@
+
+> Build error occurred
+Error: Configuring Next.js via 'next.config.ts' is not supported. Please replace the file with 'next.config.js' or 'next.config.mjs'.
+    at loadConfig (/home/ubuntu/.openclaw/workspace-main/agent-mission-control/node_modules/next/dist/server/config.js:800:19)
+    at async Span.traceAsyncFn (/home/ubuntu/.openclaw/workspace-main/agent-mission-control/node_modules/next/dist/trace/trace.js:154:20)
+    at async /home/ubuntu/.openclaw/workspace-main/agent-mission-control/node_modules/next/dist/build/index.js:374:28
+    at async Span.traceAsyncFn (/home/ubuntu/.openclaw/workspace-main/agent-mission-control/node_modules/next/dist/trace/trace.js:154:20)
+    at async build (/home/ubuntu/.openclaw/workspace-main/agent-mission-control/node_modules/next/dist/build/index.js:368:9)

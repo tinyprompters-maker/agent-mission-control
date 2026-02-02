@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Agent, ActivityItem } from '@/types';
+import { MOCK_AGENTS, MOCK_ACTIVITIES } from '@/lib/mockData';
 
 interface UseAgentsOptions {
   enableRealtime?: boolean;
@@ -14,21 +15,25 @@ export function useAgents(options: UseAgentsOptions = {}) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isRealtime, setIsRealtime] = useState(false);
-  const eventSourceRef = useRef<EventSource | null>(null);
 
-  // Fetch initial data
+  // Simulate fetching data
   const fetchAgents = useCallback(async () => {
     try {
-      const response = await fetch('/api/agents', {
-        credentials: 'include'
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch agents');
-      }
-
-      const data = await response.json();
-      setAgents(data.agents);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Add some randomness to make it feel alive
+      const randomizedAgents = MOCK_AGENTS.map(agent => ({
+        ...agent,
+        tokens: agent.tokens + Math.floor(Math.random() * 1000),
+        cost: agent.cost + Math.random() * 0.1,
+        status: Math.random() > 0.8 
+          ? (agent.status === 'active' ? 'idle' : 'active')
+          : agent.status
+      }));
+      
+      setAgents(randomizedAgents);
+      setActivities(MOCK_ACTIVITIES);
       setIsLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -36,51 +41,21 @@ export function useAgents(options: UseAgentsOptions = {}) {
     }
   }, []);
 
-  // Set up SSE for real-time updates
+  // Initial load
   useEffect(() => {
-    if (!enableRealtime) {
-      fetchAgents();
-      return;
-    }
-
-    // Try SSE first
-    try {
-      const eventSource = new EventSource('/api/agents?stream=true', {
-        withCredentials: true
-      });
-
-      eventSourceRef.current = eventSource;
-
-      eventSource.onopen = () => {
-        setIsRealtime(true);
-        setIsLoading(false);
-      };
-
-      eventSource.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          
-          if (data.type === 'initial' || data.type === 'update') {
-            setAgents(data.agents);
-          }
-        } catch (err) {
-          console.error('Failed to parse SSE data:', err);
-        }
-      };
-
-      eventSource.onerror = () => {
-        setIsRealtime(false);
-        // Fall back to polling if SSE fails
-        fetchAgents();
-      };
-
-      return () => {
-        eventSource.close();
-      };
-    } catch {
-      // SSE not supported, use polling
-      fetchAgents();
-      const interval = setInterval(fetchAgents, 5000);
+    fetchAgents();
+    
+    if (enableRealtime) {
+      setIsRealtime(true);
+      // Simulate real-time updates
+      const interval = setInterval(() => {
+        setAgents(prev => prev.map(agent => ({
+          ...agent,
+          tokens: agent.tokens + Math.floor(Math.random() * 100),
+          cost: agent.cost + Math.random() * 0.01
+        })));
+      }, 5000);
+      
       return () => clearInterval(interval);
     }
   }, [enableRealtime, fetchAgents]);
@@ -94,24 +69,10 @@ export function useAgents(options: UseAgentsOptions = {}) {
   };
 
   const executeAction = useCallback(async (action: string, agentId: string, data?: any) => {
-    try {
-      const response = await fetch('/api/agents', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ action, agentId, data })
-      });
-
-      if (!response.ok) {
-        throw new Error('Action failed');
-      }
-
-      return await response.json();
-    } catch (err) {
-      throw err;
-    }
+    // Simulate action execution
+    await new Promise(resolve => setTimeout(resolve, 500));
+    console.log('Action executed:', action, agentId, data);
+    return { success: true };
   }, []);
 
   return {

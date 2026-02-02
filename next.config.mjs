@@ -4,14 +4,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // For Cloudflare Pages
   output: 'export',
   distDir: 'dist',
   trailingSlash: true,
-  // App router
-  experimental: {
-    appDir: true,
-  },
 }
 
-module.exports = nextConfig
+export default nextConfig

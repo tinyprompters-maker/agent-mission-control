@@ -12,17 +12,8 @@ import { AgentDetail } from '@/components/AgentDetail';
 import { ActivityFeed } from '@/components/ActivityFeed';
 import { QuickActions } from '@/components/QuickActions';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
-import type { Agent, ActivityItem } from '@/types';
-
-// Mock activity data (replace with real data from useAgents)
-const ACTIVITY_FEED: ActivityItem[] = [
-  { time: '18:57', agent: '🤖 Main', action: 'Created DNS record for agents.tinyprompters.com', type: 'success' },
-  { time: '18:45', agent: '👨‍💻 Engineer', action: 'Built CRM structure documentation', type: 'complete' },
-  { time: '18:30', agent: '🤖 Main', action: 'Updated Cloudflare API token', type: 'info' },
-  { time: '18:15', agent: '✍️ Scribbles', action: 'Drafted 3 blog posts', type: 'complete' },
-  { time: '17:45', agent: '👨‍💻 Engineer', action: 'Created 4 public GitHub repos', type: 'complete' },
-  { time: '17:30', agent: '🤖 Main', action: 'Registered on Moltbook', type: 'success' },
-];
+import type { Agent } from '@/types';
+import { MOCK_ACTIVITIES } from '@/lib/mockData';
 
 export default function DashboardPage() {
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
@@ -31,7 +22,6 @@ export default function DashboardPage() {
   const handleAgentAction = async (action: string, agentId: string) => {
     try {
       await executeAction(action, agentId);
-      // Show success feedback
     } catch (error) {
       console.error('Action failed:', error);
     }
@@ -43,10 +33,10 @@ export default function DashboardPage() {
 
   return (
     <AuthGuard requireAuth={true}>
-      <div className="min-h-screen bg-gray-900">
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950">
         <Header totalCost={stats.totalCost} totalTokens={stats.totalTokens} />
 
-        <main className="p-6 max-w-7xl mx-auto">
+        <main className="p-4 sm:p-6 max-w-7xl mx-auto">
           {/* Real-time indicator */}
           <div className="flex justify-end mb-4">
             <motion.div
@@ -64,7 +54,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Stats Overview */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
             <StatsCard
               title="Active Agents"
               value={stats.activeAgents}
@@ -123,7 +113,7 @@ export default function DashboardPage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              <ActivityFeed activities={ACTIVITY_FEED} />
+              <ActivityFeed activities={MOCK_ACTIVITIES} />
               <QuickActions />
             </div>
           </div>

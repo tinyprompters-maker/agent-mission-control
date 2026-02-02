@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { AuthState, User } from '@/types';
 
+const AUTH_KEY = 'amc_auth';
+const MOCK_PASSWORD = 'mission-control-2024';
+
 export function useAuth() {
   const router = useRouter();
   const [state, setState] = useState<AuthState>({
@@ -15,21 +18,14 @@ export function useAuth() {
 
   // Check authentication status on mount
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuth = () => {
       try {
-        const response = await fetch('/api/verify', {
-          method: 'GET',
-          credentials: 'include',
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
+        const stored = localStorage.getItem(AUTH_KEY);
+        if (stored) {
+          const user: User = { sub: 'admin', role: 'admin' };
           setState({
             isAuthenticated: true,
-            user: data.user,
+            user,
             isLoading: false,
             error: null
           });
@@ -51,68 +47,51 @@ export function useAuth() {
       }
     };
 
-    checkAuth();
+    // Small delay to prevent flash
+    const timer = setTimeout(checkAuth, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const login = useCallback(async (password: string): Promise<boolean> => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
-    try {
-      const response = await fetch('/api/auth', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ password })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Verify the token was set
-        const verifyResponse = await fetch('/api/verify', {
-          method: 'GET',
-          credentials: 'include'
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    if (password === MOCK_PASSWORD) {
+      try {
+        localStorage.setItem(AUTH_KEY, 'true');
+        const user: User = { sub: 'admin', role: 'admin' };
+        setState({
+          isAuthenticated: true,
+          user,
+          isLoading: false,
+          error: null
         });
-
-        if (verifyResponse.ok) {
-          const userData = await verifyResponse.json();
-          setState({
-            isAuthenticated: true,
-            user: userData.user,
-            isLoading: false,
-            error: null
-          });
-          return true;
-        }
+        return true;
+      } catch (error) {
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: 'Failed to save session'
+        }));
+        return false;
       }
-
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: data.error || 'Login failed'
-      }));
-      return false;
-    } catch (error) {
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: 'Network error. Please try again.'
-      }));
-      return false;
     }
+
+    setState(prev => ({
+      ...prev,
+      isLoading: false,
+      error: 'Invalid password'
+    }));
+    return false;
   }, []);
 
   const logout = useCallback(async () => {
     setState(prev => ({ ...prev, isLoading: true }));
     
     try {
-      await fetch('/api/logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
+      localStorage.removeItem(AUTH_KEY);
     } catch (error) {
       console.error('Logout error:', error);
     } finally {

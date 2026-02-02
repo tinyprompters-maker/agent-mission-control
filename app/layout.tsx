@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -6,7 +6,6 @@ export const metadata: Metadata = {
   description: 'Secure dashboard for managing AI agents',
   keywords: ['agents', 'AI', 'dashboard', 'mission control'],
   authors: [{ name: 'Big Bang Interactive' }],
-  viewport: 'width=device-width, initial-scale=1',
   themeColor: '#1f2937',
   robots: 'noindex, nofollow',
   openGraph: {
@@ -14,6 +13,11 @@ export const metadata: Metadata = {
     description: 'Secure dashboard for managing AI agents',
     type: 'website',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -24,7 +28,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Security meta tags (also enforced by Cloudflare middleware) */}
         <meta httpEquiv="X-Frame-Options" content="DENY" />
         <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
         <meta httpEquiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
