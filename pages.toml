@@ -1,0 +1,4 @@
+# Cloudflare Pages Build Configuration
+[build]
+command = "npm run build"
+output_directory = "dist"
