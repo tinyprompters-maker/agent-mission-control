@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "files": {
+    "index.html": {
+      "size": 11846,
+      "hash": "abc123"
+    },
+    "404.html": {
+      "size": 2009,
+      "hash": "def456"
+    }
+  }
+}
