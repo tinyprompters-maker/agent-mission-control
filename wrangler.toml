@@ -11,16 +11,3 @@ id = "your-kv-namespace-id"
 [vars]
 # JWT_SECRET = "set-in-dashboard"
 # AUTH_PASSWORD_HASH = "set-in-dashboard"
-
-# Routes
-[[routes]]
-pattern = "agents.tinyprompters.com"
-custom_domain = true
-
-# Build settings
-[build]
-command = "npm run pages:build"
-
-# Serve the static files
-[site]
-bucket = "./dist"
