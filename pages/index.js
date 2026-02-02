@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 // Agent data structure
 const AGENTS = [
@@ -25,17 +26,30 @@ const ACTIVITY_FEED = [
 ]
 
 export default function Dashboard() {
+  const router = useRouter()
   const [selectedAgent, setSelectedAgent] = useState(null)
   const [totalCost, setTotalCost] = useState(0.08)
   const [totalTokens, setTotalTokens] = useState(45200)
 
   useEffect(() => {
+    // Check authentication
+    const auth = document.cookie.includes('auth=loggedin')
+    if (!auth) {
+      router.push('/login')
+      return
+    }
+
     // Calculate totals
     const cost = AGENTS.reduce((acc, agent) => acc + agent.cost, 0)
     const tokens = AGENTS.reduce((acc, agent) => acc + agent.tokens, 0)
     setTotalCost(cost)
     setTotalTokens(tokens)
-  }, [])
+  }, [router])
+
+  const handleLogout = () => {
+    document.cookie = 'auth=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT'
+    router.push('/login')
+  }
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -63,6 +77,12 @@ export default function Dashboard() {
               <p className="text-xs text-gray-400">Tokens Used</p>
               <p className="text-lg font-bold text-blue-400">{totalTokens.toLocaleString()}</p>
             </div>
+            <button 
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm transition"
+            >
+              Logout
+            </button>
           </div>
         </div>
       </header>
